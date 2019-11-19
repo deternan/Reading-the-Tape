@@ -23,15 +23,11 @@ import java.util.Locale;
 
 import httpGet.HttpsReader;
 
-public class HttpsGet {
-
-	//private String basic_pattern = Units.basic_pattern;
+public class HttpsGet 
+{
+	
 	private String basic_pattern = "yyyyMMdd";
 	DateFormat df = new SimpleDateFormat(basic_pattern, Locale.getDefault());	
-	// value
-	//private String url = "https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date=20190628&stockNo=2388";
-	
-	
 	
 	public HttpsGet() throws Exception
 	{
@@ -44,11 +40,9 @@ public class HttpsGet {
 		HttpsReader https = new HttpsReader();
 		https.charSet = "utf-8";
 		https.root = url;
-
-		// http.referer = "";//從哪一頁來
-		// http.subUrl = "/ray00000test/blog/63561879";//網站domain後面的子網址
-		String cookie = ""; // cookie字串
-		boolean isPost = false; // true表示用post送資料，false:get方式傳送
+		
+		String cookie = ""; 		// cookie字串
+		boolean isPost = false; 	// true表示用post送資料，false:get方式傳送
 
 		BufferedReader buf = https.readyBuffer(cookie, isPost);
 
