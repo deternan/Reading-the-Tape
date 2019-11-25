@@ -26,14 +26,14 @@ import java.util.Vector;
 
 public class getStockValue_Main 
 {
-//	String startDate = "20180101";				// start date
-//	private static int sleepTime = 5200;		// 5.2 secs
-//	private String outputFolder = "";			// output folder
-//	private String StockValue = "value.txt";	// output file name
+	private String definedStartDate = "20190101";		// start date
+	private static int sleepTime = 5200;				// 5.2 secs
+//	private String outputFolder = "";					// output folder
+//	private String StockValue = "value.txt";			// output file name
 	private String extensionName = ".txt";
 	private String ADDate_pattern = "yyyyMMdd";
 	private DateFormat df = new SimpleDateFormat(ADDate_pattern, Locale.getDefault());
-	private String definedStartDate = "20190101";
+	
 	
 	// Parameter (should been changed)
 	private String stockidlistFile = "D:\\Phelps\\GitHub\\Reading-the-Tape\\data\\idlist.txt";		// JFrame choice
@@ -93,15 +93,9 @@ public class getStockValue_Main
 			}
 			
 			// start to parse the stock value
-			
+			GetValueandProcessing_StockValue stockvalue = new GetValueandProcessing_StockValue(startDate, sleepTime);
 		}
 		
-		
-		
-		//
-		
-		
-		//GetValueandProcessing_StockValue stockvalue = new GetValueandProcessing_StockValue(startDate, outputFolder, StockValue, sleepTime);
 	}
 	
 	private void Read_definedStockIdList() throws Exception
