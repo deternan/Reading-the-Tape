@@ -3,7 +3,7 @@ package updated;
 /*
  * Parser Stock value by Date
  * version: October 02, 2019 09:30 PM
- * Last revision: November 18, 2019 11:23 PM
+ * Last revision: November 25, 2019 08:55 PM
  * 
  * Author : Chao-Hsuan Ke
  * E-mail : phelpske.dev at gmail dot com
@@ -19,6 +19,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Vector;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,9 +27,8 @@ import org.json.JSONObject;
 
 public class GetValueandProcessing_StockValue 
 {
-	private String basic_pattern = "yyyyMMdd";
-	DateFormat df = new SimpleDateFormat(basic_pattern, Locale.getDefault());
-	
+	private String ADDate_pattern = "yyyyMMdd";
+	DateFormat df = new SimpleDateFormat(ADDate_pattern, Locale.getDefault());	
 	
 	String today_str;
 	String date_str;
@@ -44,16 +44,18 @@ public class GetValueandProcessing_StockValue
 //	File file;
 //	BufferedWriter writer;
 	
-	public GetValueandProcessing_StockValue(String startDate, String sourceFolder, String StockValue,  int sleepTime) throws Exception
+	// Return 
+	private Vector returnDate;
+	private Vector returnValue;
+	
+	public GetValueandProcessing_StockValue(String startDate, int sleepTime) throws Exception
 	{
 		// Today
 		Today();
-		
-		
-		Calendar cal = Calendar.getInstance();
+						
 		String start = startDate;
 		String end = today_str;
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		SimpleDateFormat sdf = new SimpleDateFormat(ADDate_pattern);
 		Date dBegin = sdf.parse(start);
 		Date dEnd = sdf.parse(end);
 		List<Date> lDate = findDates(dBegin, dEnd);
@@ -70,6 +72,7 @@ public class GetValueandProcessing_StockValue
 			URL += date_str + "&type=IND";
 			//System.out.println(URL);
 			getValue(URL, date_str);
+			//System.out.println(date_str+"	"+value_str);
 			
 			// write file
 //			if(datecheck) {
