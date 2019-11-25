@@ -3,7 +3,7 @@ package updated;
 /*
  * Parser Stock value by Date
  * version: October 02, 2019 09:30 PM
- * Last revision: November 19, 2019 08:30 PM
+ * Last revision: November 25, 2019 08:40 PM
  * 
  * Author : Chao-Hsuan Ke
  * E-mail : phelpske.dev at gmail dot com
@@ -21,6 +21,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Vector;
 
 
 public class getStockValue_Main 
@@ -30,8 +31,9 @@ public class getStockValue_Main
 //	private String outputFolder = "";			// output folder
 //	private String StockValue = "value.txt";	// output file name
 	private String extensionName = ".txt";
-	private String ADDate_pattern = "yyyyMMdd";	
+	private String ADDate_pattern = "yyyyMMdd";
 	private DateFormat df = new SimpleDateFormat(ADDate_pattern, Locale.getDefault());
+	private String definedStartDate = "20190101";
 	
 	// Parameter (should been changed)
 	private String stockidlistFile = "D:\\Phelps\\GitHub\\Reading-the-Tape\\data\\idlist.txt";		// JFrame choice
@@ -43,9 +45,13 @@ public class getStockValue_Main
 	 	String TWDate;
 	 	String lastDate;
 	 	String ADlastDate;
+	 	String startDate;
 	 		boolean updatecheck;
 
-	
+	//
+	private Vector oldDate = new Vector();
+	private Vector oldValue = new Vector();
+//	private Vector newDate = new Vector();
 	 		
 	public getStockValue_Main() throws Exception
 	{		
@@ -54,28 +60,43 @@ public class getStockValue_Main
 			// Frame (adjusted target list id)
 		
 		// Read target list
-		Read_definedList();		
+		Read_definedStockIdList();
 		// Read stock value
 		Today();
 		
 //		for(int i=0; i<stockidlist.size(); i++) 
 		{
+			oldDate.clear();
+			oldValue.clear();
 			lastDate = "";
 			ADlastDate = "";
-			//Read_specific_stock_value(stockidlist.get(i).toString());
-			Read_specific_stock_value(stockidlist.get(0).toString());			
+			startDate = "";
 			
-			// Transfer Date from AD to TW
-			TWDate = convertTWDate(today_str);			
-			updatecheck = DateComparison(lastDate, TWDate);
-			System.out.println(updatecheck+"	"+lastDate +"	"+ today_str+"	"+TWDate);
+			//File valuefile = new File(stockvalueFolder + stockidlist.get(i));
+			File valuefile = new File(stockvalueFolder + stockidlist.get(0) + extensionName);
+			if(valuefile.exists()) {
+				Read_specific_stock_value(stockidlist.get(0).toString());			
+				
+				// Transfer Date from AD to TW
+				TWDate = convertTWDate(today_str);			
+				updatecheck = DateComparison(lastDate, TWDate);
+				//System.out.println(updatecheck+"	"+lastDate +"	"+ today_str+"	"+TWDate);
+				
+				ADlastDate = convertADDate(lastDate);			
+				// data list (get start date)
+				datelistShow(ADlastDate, today_str);
+				
+			}else {
+				//System.out.println("no value data");
+				
+				startDate = definedStartDate;				
+			}
 			
-			ADlastDate = convertADDate(lastDate);			
-			// data list
-			datelistShow(ADlastDate, today_str);
+			// start to parse the stock value
+			
 		}
 		
-		// check exist file date
+		
 		
 		//
 		
@@ -83,7 +104,7 @@ public class getStockValue_Main
 		//GetValueandProcessing_StockValue stockvalue = new GetValueandProcessing_StockValue(startDate, outputFolder, StockValue, sleepTime);
 	}
 	
-	private void Read_definedList() throws Exception
+	private void Read_definedStockIdList() throws Exception
 	{
 		String Line = "";
 		
@@ -92,11 +113,10 @@ public class getStockValue_Main
 			FileReader fr = new FileReader(stockidlistFile);
 			BufferedReader bfr = new BufferedReader(fr);
 					
-			while((Line = bfr.readLine())!=null)
-			{					
-				//System.out.println(Line);
+			while((Line = bfr.readLine())!=null){									
 				stockidlist.add(Line);
 			}
+			
 			fr.close();
 			bfr.close();
 		}else {
@@ -110,16 +130,23 @@ public class getStockValue_Main
 		String Line = "";
 		
 		File file = new File(stockvalueFolder + stockId + extensionName);
+		
+		// check whether file exist?
 		if(file.exists()) {
 			FileReader fr = new FileReader(stockvalueFolder + stockId + extensionName);
 			BufferedReader bfr = new BufferedReader(fr);
 			String tmp[];	
 			while((Line = bfr.readLine())!=null)
-			{					
+			{									
 				//System.out.println(Line);
 				tmp = Line.split("\\t");
-				lastDate = tmp[0];
+				
+				oldDate.add(tmp[0]);
+				oldValue.add(tmp[1]);
+				
+				lastDate = tmp[0];			
 			}
+			
 			fr.close();
 			bfr.close();
 		}else {
@@ -199,20 +226,25 @@ public class getStockValue_Main
 	}
 	
 	private void datelistShow(String specificDate, String todayDate) throws Exception
-	{
-		//Calendar cal = Calendar.getInstance();
+	{		
 		String start = specificDate;
 		String end = todayDate;
-		System.out.println(start+"	"+end);
+		//System.out.println(start+"	"+end);
 		
 		SimpleDateFormat sdf = new SimpleDateFormat(ADDate_pattern);		
 		Date dBegin = sdf.parse(start);
 		Date dEnd = sdf.parse(end);
 		List<Date> lDate = findDates(dBegin, dEnd);
-		for (Date date : lDate) 
-		{
-			System.out.println(date);
-		}
+		//for (Date date : lDate) 
+		
+		startDate = sdf.format(lDate.get(1));
+		
+//		for(int i=1; i<lDate.size(); i++)
+//		{
+//			String dateString = sdf.format(lDate.get(i));			 
+//			newDate.add(dateString);
+//			System.out.println(date+"	"+dateString);			
+//		}
 	}
 	
 	private static List<Date> findDates(Date dBegin, Date dEnd) 
