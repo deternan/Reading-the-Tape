@@ -92,7 +92,7 @@ public class getStockValue_Main
 				
 				// Judge TWSE or TPEX
 				stockTag = checkstockId_Tag(stockidlist.get(0).toString());
-				System.out.println(stockidlist.get(0)+"	"+stockTag);
+				//System.out.println(stockidlist.get(0)+"	"+stockTag);
 				
 				File valuefile = new File(stockvalueFolder + stockidlist.get(0) + extensionName);
 				if(valuefile.exists()) {
@@ -112,7 +112,7 @@ public class getStockValue_Main
 					
 					startDate = definedStartDate;				
 				}
-				
+				System.out.println(startDate);
 				// start to parse the stock value
 				//GetValueandProcessing_StockValue stockvalue = new GetValueandProcessing_StockValue(startDate, sleepTime);
 				
