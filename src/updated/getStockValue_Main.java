@@ -10,9 +10,9 @@ package updated;
  * 
  */
 
-
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -23,9 +23,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
 
-
 public class getStockValue_Main 
 {
+	// Parameters
 	private String definedStartDate = "20190101";		// start date
 	private static int sleepTime = 5200;				// 5.2 secs
 //	private String outputFolder = "";					// output folder
@@ -39,12 +39,18 @@ public class getStockValue_Main
 	// My Mac
 	private String stockidlistFile = "/Users/phelps/Documents/github/Reading-the-Tape/data/idlist.txt";
 	private String stockvalueFolder = "/Users/phelps/Documents/github/PTT_Stock/output/Values/";
+	private String twselistFile = "/Users/phelps/Documents/github/PTT_Stock/source/TWSE.txt";
+	private String tpexlistFile = "/Users/phelps/Documents/github/PTT_Stock/source/TPEX.txt";
 	// Windows
 //	private String stockidlistFile = "D:\\Phelps\\GitHub\\Reading-the-Tape\\data\\idlist.txt";		// JFrame choice
 //	private String stockvalueFolder = "D:\\Phelps\\GitHub\\PTT_Stock\\output\\Values\\";
 		private boolean idlist_check = false;
+		private boolean twselist_check = false;
+		private boolean tpexlist_check = false;
 		// Parameters Array
 	 	ArrayList stockidlist = new ArrayList();
+	 	ArrayList twseidlist = new ArrayList();
+	 	ArrayList tpexidlist = new ArrayList();
 	 	// Date
 	 	String today_str;
 	 	String TWDate;
@@ -52,7 +58,7 @@ public class getStockValue_Main
 	 	String ADlastDate;
 	 	String startDate;
 	 		boolean updatecheck;
-
+	 		String stockTag = "";
 	//
 	private Vector oldDate = new Vector();
 	private Vector oldValue = new Vector();
@@ -66,6 +72,11 @@ public class getStockValue_Main
 		
 		// Read target list
 		Read_definedStockIdList();
+		// Read TWSE list
+		Read_TWSE();
+		// Read TPEX list
+		Read_TPEX();
+		
 		if(idlist_check) {
 			
 			// Read stock value
@@ -78,6 +89,10 @@ public class getStockValue_Main
 				lastDate = "";
 				ADlastDate = "";
 				startDate = "";
+				
+				// Judge TWSE or TPEX
+				stockTag = checkstockId_Tag(stockidlist.get(0).toString());
+				System.out.println(stockidlist.get(0)+"	"+stockTag);
 				
 				File valuefile = new File(stockvalueFolder + stockidlist.get(0) + extensionName);
 				if(valuefile.exists()) {
@@ -99,7 +114,8 @@ public class getStockValue_Main
 				}
 				
 				// start to parse the stock value
-				GetValueandProcessing_StockValue stockvalue = new GetValueandProcessing_StockValue(startDate, sleepTime);
+				//GetValueandProcessing_StockValue stockvalue = new GetValueandProcessing_StockValue(startDate, sleepTime);
+				
 			}
 		}
 		
@@ -129,6 +145,83 @@ public class getStockValue_Main
 			idlist_check = false;
 		}
 		
+	}
+	
+	private void Read_TWSE() throws Exception 
+	{
+		String Line = "";
+		String tmp[];
+		
+		File file = new File(twselistFile);
+		if (file.exists()) {
+			FileReader fr = new FileReader(twselistFile);
+			BufferedReader bfr = new BufferedReader(fr);
+
+			while ((Line = bfr.readLine()) != null) {
+				tmp = Line.split("\t");
+				twseidlist.add(tmp[0]);
+			}
+
+			fr.close();
+			bfr.close();
+
+			twselist_check = true;
+
+		} else {
+			System.out.println("No TWSE id list");
+			twselist_check = false;
+		}
+	}
+	
+	private void Read_TPEX() throws Exception
+	{
+		String Line = "";
+		String tmp[];
+
+		File file = new File(tpexlistFile);
+		if (file.exists()) {
+			FileReader fr = new FileReader(tpexlistFile);
+			BufferedReader bfr = new BufferedReader(fr);
+
+			while ((Line = bfr.readLine()) != null) {
+				tmp = Line.split("\t");
+				tpexidlist.add(tmp[0]);
+			}
+
+			fr.close();
+			bfr.close();
+
+			tpexlist_check = true;
+
+		} else {
+			System.out.println("No TPEX id list");
+			tpexlist_check = false;
+		}
+	}
+	
+	private String checkstockId_Tag(String id)
+	{
+		String Tag = "";
+		boolean checkTag = false;
+		
+		for(int i=0; i<twseidlist.size(); i++) {
+			if(id.equalsIgnoreCase(twseidlist.get(i).toString())) {
+				Tag = "twse";
+				checkTag = true;
+				break;
+			}
+		}
+		
+		if(checkTag == false) {
+			for(int i=0; i<tpexidlist.size(); i++) {
+				if(id.equalsIgnoreCase(tpexidlist.get(i).toString())) {
+					Tag = "tpex";
+					break;
+				}
+			}
+		}
+		
+		return Tag;
 	}
 	
 	private void Read_specific_stock_value(String stockId) throws Exception
