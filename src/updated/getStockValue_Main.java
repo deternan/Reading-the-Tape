@@ -3,7 +3,7 @@ package updated;
 /*
  * Parser Stock value by Date
  * version: October 02, 2019 09:30 PM
- * Last revision: November 25, 2019 08:40 PM
+ * Last revision: November 30, 2019 10:10 AM
  * 
  * Author : Chao-Hsuan Ke
  * E-mail : phelpske.dev at gmail dot com
@@ -36,8 +36,13 @@ public class getStockValue_Main
 	
 	
 	// Parameter (should been changed)
-	private String stockidlistFile = "D:\\Phelps\\GitHub\\Reading-the-Tape\\data\\idlist.txt";		// JFrame choice
-	private String stockvalueFolder = "D:\\Phelps\\GitHub\\PTT_Stock\\output\\Values\\";
+	// My Mac
+	private String stockidlistFile = "/Users/phelps/Documents/github/Reading-the-Tape/data/idlist.txt";
+	private String stockvalueFolder = "/Users/phelps/Documents/github/PTT_Stock/output/Values/";
+	// Windows
+//	private String stockidlistFile = "D:\\Phelps\\GitHub\\Reading-the-Tape\\data\\idlist.txt";		// JFrame choice
+//	private String stockvalueFolder = "D:\\Phelps\\GitHub\\PTT_Stock\\output\\Values\\";
+		private boolean idlist_check = false;
 		// Parameters Array
 	 	ArrayList stockidlist = new ArrayList();
 	 	// Date
@@ -61,40 +66,43 @@ public class getStockValue_Main
 		
 		// Read target list
 		Read_definedStockIdList();
-		// Read stock value
-		Today();
-		
-//		for(int i=0; i<stockidlist.size(); i++) 
-		{
-			oldDate.clear();
-			oldValue.clear();
-			lastDate = "";
-			ADlastDate = "";
-			startDate = "";
+		if(idlist_check) {
 			
-			//File valuefile = new File(stockvalueFolder + stockidlist.get(i));
-			File valuefile = new File(stockvalueFolder + stockidlist.get(0) + extensionName);
-			if(valuefile.exists()) {
-				Read_specific_stock_value(stockidlist.get(0).toString());			
+			// Read stock value
+			Today();
+			
+//			for(int i=0; i<stockidlist.size(); i++) 
+			{
+				oldDate.clear();
+				oldValue.clear();
+				lastDate = "";
+				ADlastDate = "";
+				startDate = "";
 				
-				// Transfer Date from AD to TW
-				TWDate = convertTWDate(today_str);			
-				updatecheck = DateComparison(lastDate, TWDate);
-				//System.out.println(updatecheck+"	"+lastDate +"	"+ today_str+"	"+TWDate);
+				File valuefile = new File(stockvalueFolder + stockidlist.get(0) + extensionName);
+				if(valuefile.exists()) {
+					Read_specific_stock_value(stockidlist.get(0).toString());			
+					
+					// Transfer Date from AD to TW
+					TWDate = convertTWDate(today_str);			
+					updatecheck = DateComparison(lastDate, TWDate);
+					//System.out.println(updatecheck+"	"+lastDate +"	"+ today_str+"	"+TWDate);
+					
+					ADlastDate = convertADDate(lastDate);			
+					// data list (get start date)
+					datelistShow(ADlastDate, today_str);
+					
+				}else {
+					//System.out.println("no value data");
+					
+					startDate = definedStartDate;				
+				}
 				
-				ADlastDate = convertADDate(lastDate);			
-				// data list (get start date)
-				datelistShow(ADlastDate, today_str);
-				
-			}else {
-				//System.out.println("no value data");
-				
-				startDate = definedStartDate;				
+				// start to parse the stock value
+				GetValueandProcessing_StockValue stockvalue = new GetValueandProcessing_StockValue(startDate, sleepTime);
 			}
-			
-			// start to parse the stock value
-			GetValueandProcessing_StockValue stockvalue = new GetValueandProcessing_StockValue(startDate, sleepTime);
 		}
+		
 		
 	}
 	
@@ -113,8 +121,12 @@ public class getStockValue_Main
 			
 			fr.close();
 			bfr.close();
+			
+			idlist_check = true;
+			
 		}else {
 			System.out.println("No stock id list");
+			idlist_check = false;
 		}
 		
 	}
