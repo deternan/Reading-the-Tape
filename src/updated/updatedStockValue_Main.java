@@ -3,7 +3,7 @@ package updated;
 /*
  * Parser Stock value by Date
  * version: October 02, 2019 09:30 PM
- * Last revision: November 30, 2019 10:10 AM
+ * Last revision: December 01, 2019 05:20 AM
  * 
  * Author : Chao-Hsuan Ke
  * E-mail : phelpske.dev at gmail dot com
@@ -12,8 +12,8 @@ package updated;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,9 +21,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Vector;
 
-public class getStockValue_Main 
+public class updatedStockValue_Main 
 {
 	// Parameters
 	private String definedStartDate = "20190101";		// start date
@@ -59,15 +58,17 @@ public class getStockValue_Main
 	 	String startDate;
 	 		boolean updatecheck;
 	 		String stockTag = "";
-	//
+	 		
+	// past record data
 	private ArrayList oldDate = new ArrayList();
 	private ArrayList oldValue = new ArrayList();
-	
 	// get new data
+	GetValueandProcessingByStockId stockvaluebyId;
 	ArrayList dateoutput = new ArrayList();
 	ArrayList valueoutput = new ArrayList();
+	int dataindex;
 	 		
-	public getStockValue_Main() throws Exception
+	public updatedStockValue_Main() throws Exception
 	{		
 		
 		// should been done
@@ -80,25 +81,29 @@ public class getStockValue_Main
 		// Read TPEX list
 		Read_TPEX();
 		
+		
 		if(idlist_check) {
 			
 			// Read stock value
 			Today();
-			
-//			for(int i=0; i<stockidlist.size(); i++) 
+			String stockId;
+			for(int i=0; i<stockidlist.size(); i++) 
 			{
+				stockId = stockidlist.get(i).toString();
 				oldDate.clear();
 				oldValue.clear();
 				lastDate = "";
 				ADlastDate = "";
 				startDate = "";
+				dataindex = 0;
+				
 				
 				// Judge TWSE or TPEX
-				stockTag = checkstockId_Tag(stockidlist.get(0).toString());
+				stockTag = checkstockId_Tag(stockId);
 				
-				File valuefile = new File(stockvalueFolder + stockidlist.get(0) + extensionName);
+				File valuefile = new File(stockvalueFolder + stockId + extensionName);
 				if(valuefile.exists()) {
-					Read_specific_stock_value(stockidlist.get(0).toString());			
+					Read_specific_stock_value(stockId);			
 					
 					// Transfer Date from AD to TW
 					TWDate = convertTWDate(today_str);			
@@ -112,29 +117,37 @@ public class getStockValue_Main
 				}else {
 					//System.out.println("no value data");
 					
-					startDate = definedStartDate;				
+					startDate = definedStartDate;		
 				}
 				
-				//System.out.println(startDate);
-				
-				// start to parse the stock value
-				//GetValueandProcessing_StockValue stockvalue = new GetValueandProcessing_StockValue(startDate, sleepTime);
-				
 				// start to parse the stock value by Id
-				GetValueandProcessingByStockId stockvaluebyId = new GetValueandProcessingByStockId(startDate, sleepTime, stockidlist.get(0).toString(), stockTag);
+				stockvaluebyId = new GetValueandProcessingByStockId(startDate, sleepTime, stockId, stockTag);
 				
 				dateoutput = stockvaluebyId.ReturnDate();
 				valueoutput = stockvaluebyId.ReturnValue();
 				
-				for(int i=0; i<dateoutput.size(); i++)
-				{
-					System.out.println(dateoutput.get(i)+"	"+valueoutput.get(i));
+				// updated data (source file)
+				FileWriter writer = new FileWriter(stockvalueFolder + stockId + extensionName, true);
+				
+				// check date
+				checkDateduplication(lastDate);
+				
+				if(dataindex > 0) {
+					
+					for (int j=(dataindex+1); j<dateoutput.size(); j++) 
+					{
+						writer.write(dateoutput.get(j) + "	" + valueoutput.get(j)+"\n");
+					}
+				}else {
+					for (int j=0; j<dateoutput.size(); j++) 
+					{
+						writer.write(dateoutput.get(j) + "	" + valueoutput.get(j)+"\n");
+					}
 				}
 				
+				writer.close();
 			}
 		}
-		
-		
 	}
 	
 	private void Read_definedStockIdList() throws Exception
@@ -266,8 +279,6 @@ public class getStockValue_Main
 		}else {
 			System.out.println("No "+ stockId + "value");
 		}
-		
-		//System.out.println(lastDate);
 	}
 	
 	private void Today() 
@@ -351,7 +362,6 @@ public class getStockValue_Main
 		//for (Date date : lDate) 
 		
 		startDate = sdf.format(lDate.get(1));
-		
 	}
 	
 	private static List<Date> findDates(Date dBegin, Date dEnd) 
@@ -373,10 +383,22 @@ public class getStockValue_Main
 		return lDate;
 	}
 	
+	private void checkDateduplication(String oldlastDate)
+	{
+		for(int i=0; i<dateoutput.size(); i++)
+		{
+			if(oldlastDate.equalsIgnoreCase(dateoutput.get(i).toString())) {
+				dataindex = i;
+				break;
+			}
+		}
+		
+	}
+	
 	public static void main(String args[])
 	{
 		try {
-			getStockValue_Main gsv = new getStockValue_Main();
+			updatedStockValue_Main gsv = new updatedStockValue_Main();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

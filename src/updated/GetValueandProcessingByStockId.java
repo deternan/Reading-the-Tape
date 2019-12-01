@@ -3,7 +3,7 @@ package updated;
 /*
  * Parser values
  * version: November 30, 2019 09:59 PM
- * Last revision: December 01, 2019 01:26 PM
+ * Last revision: December 01, 2019 05:20 PM
  * 
  * Author : Chao-Hsuan Ke
  * E-mail : phelpske.dev at gmail dot com
@@ -66,11 +66,9 @@ public class GetValueandProcessingByStockId
 	
 	public GetValueandProcessingByStockId(String startDate, int sleepTime, String ID, String tag) throws Exception 
 	{
-		
 		this.ID = ID;
 		this.tag = tag;
-//		dataData_check = true;
-		
+
 		startYear = startDate.substring(0, 4);
 		startMonth = startDate.substring(4, 6);
 		startDay = startDate.substring(6, 8);
@@ -85,11 +83,13 @@ public class GetValueandProcessingByStockId
 		
 		List<String> monthList = MonthIncrement(startYear + startMonth, monthGap);
 		
+		int TWYear;
+		String TWMonthStr;
 		for(int i=0; i<monthList.size(); i++)
 		{
 			sourceLine = "";
 			
-			// Processing and Storage
+			// Processing
 			// get data from URL
 			if ("twse".equalsIgnoreCase(this.tag)) {
 				GetValues(monthList.get(i) + startDay, this.tag);
@@ -99,7 +99,11 @@ public class GetValueandProcessingByStockId
 			} else if ("tpex".equalsIgnoreCase(this.tag)) {
 				// GetValues(existDate.substring(0, 3) + "/"+ existDate.substring(3, 5),
 				// this.tag);
-				GetValues(startYear + "/" + startMonth, this.tag);
+				TWYear = Integer.parseInt(startYear);
+				TWYear = TWYear - 1911;
+				TWMonthStr = monthList.get(i).toString().substring(4, 6);
+				//GetValues(startYear + "/" + startMonth, this.tag);
+				GetValues(String.valueOf(TWYear) + "/" + TWMonthStr, this.tag);
 				if (isJSONValid(sourceLine)) {
 					Processing_TPEX(sourceLine);
 				}
@@ -107,7 +111,6 @@ public class GetValueandProcessingByStockId
 			
 			// Thread sleep
 			Thread.sleep((int) sleepTime);
-	
 		}
 		
 		// Message
@@ -160,26 +163,6 @@ public class GetValueandProcessingByStockId
 		return result;
 	}
 	
-	private static List<Date> findDates(Date dBegin, Date dEnd) 
-	{
-		List lDate = new ArrayList();
-		lDate.add(dBegin);
-		Calendar calBegin = Calendar.getInstance();
-
-		calBegin.setTime(dBegin);
-		Calendar calEnd = Calendar.getInstance();
-
-		calEnd.setTime(dEnd);
-
-		while (dEnd.after(calBegin.getTime())) {
-
-			calBegin.add(Calendar.DAY_OF_MONTH, 1);
-			lDate.add(calBegin.getTime());
-		}
-		
-		return lDate;
-	}
-	
 	private void GetValues(String DateStr, String tag)
 	{
 		sourceLine = "";
@@ -193,7 +176,7 @@ public class GetValueandProcessingByStockId
 			// https://www.tpex.org.tw/web/stock/aftertrading/daily_trading_info/st43_result.php?d=107/08&stkno=3105
 			URL = TPEXvalueUrl + DateStr + "&stkno=" + ID;
 		}
-		
+		//System.out.println(URL);
 		
 		try {
 			HttpsGet https = new HttpsGet();
@@ -247,6 +230,7 @@ public class GetValueandProcessingByStockId
 				JSONArray arrayData = new JSONArray(jsonarray.get(i).toString());
 				//Storage(arrayData.get(0).toString(), arrayData.get(6).toString());
 				dateStr = arrayData.get(0).toString().replace("/", "");
+				//System.out.println(arrayData.get(0)+"	"+arrayData.get(6)+"	"+dateStr);
 				dateoutput.add(dateStr);
 				valueoutput.add(arrayData.get(6).toString());
 			}
