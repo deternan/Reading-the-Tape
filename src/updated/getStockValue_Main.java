@@ -60,9 +60,12 @@ public class getStockValue_Main
 	 		boolean updatecheck;
 	 		String stockTag = "";
 	//
-	private Vector oldDate = new Vector();
-	private Vector oldValue = new Vector();
-//	private Vector newDate = new Vector();
+	private ArrayList oldDate = new ArrayList();
+	private ArrayList oldValue = new ArrayList();
+	
+	// get new data
+	ArrayList dateoutput = new ArrayList();
+	ArrayList valueoutput = new ArrayList();
 	 		
 	public getStockValue_Main() throws Exception
 	{		
@@ -92,7 +95,6 @@ public class getStockValue_Main
 				
 				// Judge TWSE or TPEX
 				stockTag = checkstockId_Tag(stockidlist.get(0).toString());
-				//System.out.println(stockidlist.get(0)+"	"+stockTag);
 				
 				File valuefile = new File(stockvalueFolder + stockidlist.get(0) + extensionName);
 				if(valuefile.exists()) {
@@ -112,9 +114,22 @@ public class getStockValue_Main
 					
 					startDate = definedStartDate;				
 				}
-				System.out.println(startDate);
+				
+				//System.out.println(startDate);
+				
 				// start to parse the stock value
 				//GetValueandProcessing_StockValue stockvalue = new GetValueandProcessing_StockValue(startDate, sleepTime);
+				
+				// start to parse the stock value by Id
+				GetValueandProcessingByStockId stockvaluebyId = new GetValueandProcessingByStockId(startDate, sleepTime, stockidlist.get(0).toString(), stockTag);
+				
+				dateoutput = stockvaluebyId.ReturnDate();
+				valueoutput = stockvaluebyId.ReturnValue();
+				
+				for(int i=0; i<dateoutput.size(); i++)
+				{
+					System.out.println(dateoutput.get(i)+"	"+valueoutput.get(i));
+				}
 				
 			}
 		}
@@ -328,7 +343,6 @@ public class getStockValue_Main
 	{		
 		String start = specificDate;
 		String end = todayDate;
-		//System.out.println(start+"	"+end);
 		
 		SimpleDateFormat sdf = new SimpleDateFormat(ADDate_pattern);		
 		Date dBegin = sdf.parse(start);
@@ -338,12 +352,6 @@ public class getStockValue_Main
 		
 		startDate = sdf.format(lDate.get(1));
 		
-//		for(int i=1; i<lDate.size(); i++)
-//		{
-//			String dateString = sdf.format(lDate.get(i));			 
-//			newDate.add(dateString);
-//			System.out.println(date+"	"+dateString);			
-//		}
 	}
 	
 	private static List<Date> findDates(Date dBegin, Date dEnd) 
