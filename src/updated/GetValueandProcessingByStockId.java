@@ -3,7 +3,7 @@ package updated;
 /*
  * Parser values
  * version: November 30, 2019 09:59 PM
- * Last revision: December 01, 2019 05:20 PM
+ * Last revision: December 06, 2019 10:26 PM
  * 
  * Author : Chao-Hsuan Ke
  * E-mail : phelpske.dev at gmail dot com
@@ -71,7 +71,8 @@ public class GetValueandProcessingByStockId
 
 		startYear = startDate.substring(0, 4);
 		startMonth = startDate.substring(4, 6);
-		startDay = startDate.substring(6, 8);
+		//startDay = startDate.substring(6, 8);
+		startDay = "01";
 		
 		// Date
 		Date today = Calendar.getInstance().getTime();
@@ -97,8 +98,7 @@ public class GetValueandProcessingByStockId
 					Processing_TWSE(sourceLine);
 				}
 			} else if ("tpex".equalsIgnoreCase(this.tag)) {
-				// GetValues(existDate.substring(0, 3) + "/"+ existDate.substring(3, 5),
-				// this.tag);
+				
 				TWYear = Integer.parseInt(startYear);
 				TWYear = TWYear - 1911;
 				TWMonthStr = monthList.get(i).toString().substring(4, 6);
@@ -176,7 +176,7 @@ public class GetValueandProcessingByStockId
 			// https://www.tpex.org.tw/web/stock/aftertrading/daily_trading_info/st43_result.php?d=107/08&stkno=3105
 			URL = TPEXvalueUrl + DateStr + "&stkno=" + ID;
 		}
-		//System.out.println(URL);
+		System.out.println(URL);
 		
 		try {
 			HttpsGet https = new HttpsGet();
