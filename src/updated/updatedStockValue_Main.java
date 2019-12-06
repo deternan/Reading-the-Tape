@@ -3,7 +3,7 @@ package updated;
 /*
  * Parser Stock value by Date
  * version: October 02, 2019 09:30 PM
- * Last revision: December 01, 2019 05:20 AM
+ * Last revision: December 06, 2019 10:28 PM
  * 
  * Author : Chao-Hsuan Ke
  * E-mail : phelpske.dev at gmail dot com
@@ -108,15 +108,13 @@ public class updatedStockValue_Main
 					// Transfer Date from AD to TW
 					TWDate = convertTWDate(today_str);			
 					updatecheck = DateComparison(lastDate, TWDate);
-					//System.out.println(updatecheck+"	"+lastDate +"	"+ today_str+"	"+TWDate);
 					
 					ADlastDate = convertADDate(lastDate);			
 					// data list (get start date)
 					datelistShow(ADlastDate, today_str);
 					
 				}else {
-					//System.out.println("no value data");
-					
+					System.out.println("no value data");
 					startDate = definedStartDate;		
 				}
 				
@@ -359,9 +357,13 @@ public class updatedStockValue_Main
 		Date dBegin = sdf.parse(start);
 		Date dEnd = sdf.parse(end);
 		List<Date> lDate = findDates(dBegin, dEnd);
-		//for (Date date : lDate) 
 		
-		startDate = sdf.format(lDate.get(1));
+		if(lDate.size() >  1) {
+			startDate = sdf.format(lDate.get(1));
+		}else {
+			startDate = sdf.format(lDate.get(0));
+		}
+		//System.out.println(lDate.size()+"	"+startDate);
 	}
 	
 	private static List<Date> findDates(Date dBegin, Date dEnd) 
