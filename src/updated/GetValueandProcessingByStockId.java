@@ -117,7 +117,6 @@ public class GetValueandProcessingByStockId
 		System.out.println(this.ID+"	Finished");
 	}
 
-	
 	private List<String> MonthIncrement(String startDate, int addMonths) throws Exception
 	{
 		List<String> monthList = new ArrayList();
@@ -193,7 +192,6 @@ public class GetValueandProcessingByStockId
 	
 	private boolean isJSONValid(String jsonInString) 
 	{
-
 		JsonParser parser = new JsonParser();
 		JsonElement jsonele = parser.parse(jsonInString);
 		boolean check;

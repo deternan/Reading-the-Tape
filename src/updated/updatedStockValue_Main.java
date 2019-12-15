@@ -323,8 +323,6 @@ public class updatedStockValue_Main
 	
 	private String convertADDate(String TW)
 	{
-		// 1080101
-		// 990101
 		String yearTmp;
 		String monthdayTmp = "";
 		int yearInt = 0;

@@ -200,7 +200,6 @@ public class kdvalues
 				todayKvalue = ((lastKvalue*2)/3) + (todayRSV/3);
 				circleKvalue.add(todayKvalue);
 				
-				//System.out.println("-----------------------	"+circleTodayValue +"	"+ maxValue+"	"+minValue);
 				//System.out.println("-----------------------	"+circleTodayValue+"	"+lastKvalue+"	"+todayRSV+"	"+todayKvalue+"	"+type);
 				System.out.println("-----------------------	"+dateoutput.get(i+9)+"	"+circleTodayValue+"	"+maxValue+"	"+minValue+"	"+lastKvalue+"	"+todayRSV+"	"+todayKvalue+"	"+type);
 			}
